@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 )
 
 var tmpl = `
@@ -27,8 +28,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("'%s'", templateMeta)
-	render(body, map[string]string{
-		"from": "2025-07-15",
-	})
+	fmt.Println(templateMeta)
+	ctx, err := parseParams(templateMeta)
+	if err != nil {
+		log.Fatal(err)
+	}
+	render(body, ctx)
 }
