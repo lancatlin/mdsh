@@ -19,3 +19,5 @@ type ParamSpec struct {
 	Required bool   `yaml:"required"`
 	Default  string `yaml:"default"`
 }
+
+type TemplateContext map[string]string
