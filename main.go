@@ -10,7 +10,12 @@ import (
 
 var tmpl = `
 ---
-title: This is the title
+output: "reports/${from}.md"
+params:
+  from:
+    required: true
+  file:
+    default: "ledger.j"
 ---
 Hello this is the text:
 {{ sh "hledger bal assets" }}
@@ -50,7 +55,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("'%s'", frontmatter)
+	templateMeta, err := parseFrontmatter(frontmatter)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("'%s'", templateMeta)
 	t, err := template.New("foo").Funcs(funcMap).Parse(body)
 	if err != nil {
 		panic(err)
