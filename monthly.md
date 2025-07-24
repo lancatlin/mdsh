@@ -1,5 +1,5 @@
 ---
-name: "reports/${from}.md"
+output: "reports_{{.from}}.md"
 params:
   from:
     required: true
@@ -9,24 +9,24 @@ params:
     default: ~/.hledger.journal
 ---
 
-# Finance Report from {from} to {to}
+# Finance Report from {{.from}} to {{.to}}
 
 ## Previous status:
 
-{{hledger -f $file balancesheet -e $from }}
+{{ sh "hledger -f $file balancesheet -e $from" }}
 
 ## Expenses:
 
 ### Expense Summary by Category
 
-{{hledger -f $file bal expenses -b $from -e $to --depth 3 --sort amount}}
+{{ sh "hledger -f $file bal expenses -b $from -e $to --depth 3 --sort amount" }}
 
-{{hledger -f $file bal expenses -b $from -e $to --depth 2 --sort amount}}
+{{ sh "hledger -f $file bal expenses -b $from -e $to --depth 2 --sort amount" }}
 
 ## Net Income:
 
-{{hledger -f $file income -b $from -e $to --monthly}}
+{{sh "hledger -f $file income -b $from -e $to --monthly"}}
 
 ## Ending balance:
 
-{{hledger -f $file balancesheet -e $to}}
+{{sh "hledger -f $file balancesheet -e $to"}}

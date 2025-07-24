@@ -29,6 +29,6 @@ func parseDocument(doc string) (frontmatter string, body string, err error) {
 		return
 	}
 	frontmatter = parts[1]
-	body = parts[2]
+	body = strings.TrimLeft(parts[2], "\n ")
 	return
 }

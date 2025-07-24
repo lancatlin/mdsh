@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"os"
 	"os/exec"
 	"text/template"
 )
@@ -13,7 +13,6 @@ func sh(ctx TemplateContext) func(string) string {
 		for k, v := range ctx {
 			cmd.Env = append(cmd.Env, k+"="+v)
 		}
-		fmt.Println(cmd.Environ())
 		out, err := cmd.Output()
 		if err != nil {
 			return fmt.Sprintf("> Failed to execute the command: %s\n> %s\n", cmd.Args, err.Error())
@@ -22,7 +21,7 @@ func sh(ctx TemplateContext) func(string) string {
 	}
 }
 
-func render(tmpl string, ctx TemplateContext) {
+func render(tmpl string, ctx TemplateContext) []byte {
 	funcMap := template.FuncMap{
 		"sh": sh(ctx),
 	}
@@ -30,5 +29,10 @@ func render(tmpl string, ctx TemplateContext) {
 	if err != nil {
 		panic(err)
 	}
-	t.Execute(os.Stdout, ctx)
+	var buf bytes.Buffer
+	err = t.Execute(&buf, ctx)
+	if err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
 }
