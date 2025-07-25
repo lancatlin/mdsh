@@ -1,32 +1,45 @@
 ---
-output: "reports_{{.from}}.md"
+output: "reports_{{.b}}.md"
 params:
-  from:
+  b:
     required: true
-  to:
+    usage: |
+      Required.
+      The begin time of report.
+      Examples:
+        2025
+        2025-07
+        2025-07-15
+        Jul
+  e:
     required: true
-  file:
+    usage: |
+      Required.
+      The end time of report.
+      Same format as -b
+  f:
     default: ~/.hledger.journal
+    usage: The ledger file to parse
 ---
 
-# Finance Report from {{.from}} to {{.to}}
+# Finance Report from {{.b}} to {{.e}}
 
 ## Previous status:
 
-{{ sh "hledger -f $file balancesheet -e $from" }}
+{{ sh "hledger -f $f balancesheet -e $b" }}
 
 ## Expenses:
 
 ### Expense Summary by Category
 
-{{ sh "hledger -f $file bal expenses -b $from -e $to --depth 3 --sort amount" }}
+{{ sh "hledger -f $f bal expenses -b $b -e $e --depth 3 --sort amount" }}
 
-{{ sh "hledger -f $file bal expenses -b $from -e $to --depth 2 --sort amount" }}
+{{ sh "hledger -f $f bal expenses -b $b -e $e --depth 2 --sort amount" }}
 
 ## Net Income:
 
-{{sh "hledger -f $file income -b $from -e $to --monthly"}}
+{{sh "hledger -f $f income -b $b -e $e --monthly"}}
 
 ## Ending balance:
 
-{{sh "hledger -f $file balancesheet -e $to"}}
+{{sh "hledger -f $f balancesheet -e $e"}}

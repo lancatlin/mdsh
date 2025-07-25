@@ -36,6 +36,7 @@ func (meta TemplateMeta) OutputFile(ctx TemplateContext) (output string, err err
 type ParamSpec struct {
 	Required bool   `yaml:"required"`
 	Default  string `yaml:"default"`
+	Usage    string `yaml:"usage"`
 }
 
 type TemplateContext map[string]string
