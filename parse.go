@@ -23,7 +23,7 @@ func parseDocument(doc string) (frontmatter string, body string, err error) {
 		err = fmt.Errorf("Invalid document: frontmatter required.\n%s", doc)
 		return
 	}
-	parts := strings.Split(doc, sep)
+	parts := strings.SplitN(doc, sep, 3)
 	if len(parts) < 3 {
 		err = fmt.Errorf("Invalid document: frontmatter required.\n%s", doc)
 		return
