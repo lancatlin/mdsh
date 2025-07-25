@@ -1,4 +1,4 @@
-module github.com/lancatlin/mdsh-go
+module github.com/lancatlin/mdsh
 
 go 1.24.5
 

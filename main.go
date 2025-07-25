@@ -1,12 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"os"
 )
 
-var tmpl = `
+var TMPL_EXAMPLE = `
 ---
 output: "reports/${from}.md"
 params:
@@ -20,40 +20,44 @@ Start from {{ .from }}
 {{ sh "hledger bal assets -b $from" }}
 `
 
-func loadTemplate() string {
+func main() {
+	tmpl, err := loadTemplate()
+	handleError(err)
+
+	frontmatter, body, err := parseDocument(tmpl)
+	handleError(err)
+
+	templateMeta, err := parseFrontmatter(frontmatter)
+	handleError(err)
+
+	ctx, err := parseParams(templateMeta)
+	handleError(err)
+
+	data := render(body, ctx)
+	output, err := templateMeta.OutputFile(ctx)
+	handleError(err)
+
+	err = os.WriteFile(output, data, 0644)
+	handleError(err)
+
+	fmt.Printf("Result saved to %s\n", output)
+}
+
+func loadTemplate() (string, error) {
 	if len(os.Args) < 2 {
-		log.Fatal("Please input a markdown template file")
+		return "", errors.New("Please input a markdown template file")
 	}
 	filename := os.Args[1]
 	dat, err := os.ReadFile(filename)
 	if err != nil {
-		log.Fatal("Failed to open the file", err)
+		return "", fmt.Errorf("Failed to open file: %w", err)
 	}
-	return string(dat)
+	return string(dat), nil
 }
 
-func main() {
-	tmpl := loadTemplate()
-	frontmatter, body, err := parseDocument(tmpl)
+func handleError(err error) {
 	if err != nil {
-		log.Fatal(err)
-	}
-	templateMeta, err := parseFrontmatter(frontmatter)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(templateMeta)
-	ctx, err := parseParams(templateMeta)
-	if err != nil {
-		log.Fatal(err)
-	}
-	data := render(body, ctx)
-	output, err := templateMeta.OutputFile(ctx)
-	if err != nil {
-		panic(err)
-	}
-	err = os.WriteFile(output, data, 0644)
-	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
