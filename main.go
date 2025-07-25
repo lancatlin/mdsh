@@ -33,14 +33,12 @@ func main() {
 	ctx, err := parseParams(templateMeta)
 	handleError(err)
 
-	data := render(body, ctx)
-	output, err := templateMeta.OutputFile(ctx)
+	output, err := ctx.OutputFile(templateMeta)
 	handleError(err)
+	defer output.Close()
 
-	err = os.WriteFile(output, data, 0644)
+	err = ctx.render(body, output)
 	handleError(err)
-
-	fmt.Printf("Result saved to %s\n", output)
 }
 
 func loadTemplate() (string, error) {
