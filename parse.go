@@ -7,26 +7,28 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func parseFrontmatter(input string) (meta TemplateMeta, err error) {
-	err = yaml.Unmarshal([]byte(input), &meta)
+func parseDocument(doc string) (meta TemplateMeta, body string, err error) {
+	frontmatter, body := separateDocument(doc)
+	if frontmatter == "" {
+		return TemplateMeta{}, body, nil
+	}
+	err = yaml.Unmarshal([]byte(frontmatter), &meta)
 	if err != nil {
 		err = fmt.Errorf("Failed to parse frontmatter: %w", err)
 		return
 	}
-	return
+	return meta, body, nil
 }
 
-func parseDocument(doc string) (frontmatter string, body string, err error) {
+func separateDocument(doc string) (frontmatter string, body string) {
 	doc = strings.TrimLeft(doc, " \n")
 	sep := "---\n"
 	if !strings.HasPrefix(doc, sep) {
-		err = fmt.Errorf("Invalid document: frontmatter required.\n%s", doc)
-		return
+		return "", doc
 	}
 	parts := strings.SplitN(doc, sep, 3)
 	if len(parts) < 3 {
-		err = fmt.Errorf("Invalid document: frontmatter required.\n%s", doc)
-		return
+		return "", doc
 	}
 	frontmatter = parts[1]
 	body = strings.TrimLeft(parts[2], "\n ")

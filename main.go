@@ -6,28 +6,11 @@ import (
 	"os"
 )
 
-var TMPL_EXAMPLE = `
----
-output: "reports/${from}.md"
-params:
-  from:
-    required: true
-  file:
-    default: "ledger.j"
----
-Hello this is the text:
-Start from {{ .from }}
-{{ sh "hledger bal assets -b $from" }}
-`
-
 func main() {
-	tmpl, err := loadTemplate()
+	doc, err := loadTemplate()
 	handleError(err)
 
-	frontmatter, body, err := parseDocument(tmpl)
-	handleError(err)
-
-	templateMeta, err := parseFrontmatter(frontmatter)
+	templateMeta, body, err := parseDocument(doc)
 	handleError(err)
 
 	ctx, err := parseParams(templateMeta)
